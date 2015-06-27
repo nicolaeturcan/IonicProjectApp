@@ -1,3 +1,4 @@
+
 var app = angular.module('navApp', ['ionic', 'swipe', 'wu.masonry', 'ab-base64', 'base64', 'ui.router', 'ngCordova', 'ngCordova.plugins.fileTransfer', 'ngRoute'])
 
 /*app.run(function($cordovaStatusbar) {
@@ -10,7 +11,7 @@ var app = angular.module('navApp', ['ionic', 'swipe', 'wu.masonry', 'ab-base64',
  })*/
 
 // RUTAS
-app.config(function ($stateProvider, $urlRouterProvider, $ionicConfigProvider, $compileProvider) {
+app.config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider,$compileProvider) {
 
     $ionicConfigProvider.tabs.position('bottom');
     $ionicConfigProvider.tabs.style("standard");
@@ -23,7 +24,7 @@ app.config(function ($stateProvider, $urlRouterProvider, $ionicConfigProvider, $
         url: '/tabs',
         abstract: true,
         templateUrl: 'tabs.html'
-    })
+    });
 
     $stateProvider.state('tabs.gallery', {
         url: '/gallery',
@@ -33,7 +34,7 @@ app.config(function ($stateProvider, $urlRouterProvider, $ionicConfigProvider, $
                 controller: 'GalleryCtrl'
             }
         }
-    })
+    });
 
     $stateProvider.state('tabs.today', {
         url: '/today',
@@ -43,7 +44,7 @@ app.config(function ($stateProvider, $urlRouterProvider, $ionicConfigProvider, $
                 controller: 'TodayCtrl'
             }
         }
-    })
+    });
 
     $stateProvider.state('tabs.profile', {
         url: '/profile',
@@ -53,7 +54,7 @@ app.config(function ($stateProvider, $urlRouterProvider, $ionicConfigProvider, $
                 controller: 'ProfileCtrl'
             }
         }
-    })
+    });
 
     $stateProvider.state('tabs.article', {
         url: '/article/:id',
@@ -64,7 +65,7 @@ app.config(function ($stateProvider, $urlRouterProvider, $ionicConfigProvider, $
             }
         }
 
-    })
+    });
 
     $stateProvider.state('tabs.new-post', {
         url: '/new-post',
@@ -74,22 +75,22 @@ app.config(function ($stateProvider, $urlRouterProvider, $ionicConfigProvider, $
                 controller: 'NewPostCtrl'
             }
         }
-    })
+    });
 
     $compileProvider.imgSrcSanitizationWhitelist(/^\s*(https?|ftp|mailto|file|tel):/);
 });
 
-app.factory('Camera', ['$q', function ($q) {
+app.factory('Camera', ['$q', function($q) {
 
     return {
-        getPicture: function (options) {
+        getPicture: function(options) {
             var q = $q.defer();
 
-            navigator.camera.getPicture(function (result) {
+            navigator.camera.getPicture(function(result) {
 
                 // Do any magic you need
                 q.resolve(result);
-            }, function (err) {
+            }, function(err) {
                 q.reject(err);
             }, options);
 
@@ -100,13 +101,31 @@ app.factory('Camera', ['$q', function ($q) {
 
 // CONTROLADORES
 
-app.controller('GalleryCtrl', function ($scope, $state, $http, $ionicModal, $ionicActionSheet, Camera, $cordovaFileTransfer) {
-    $scope.title = "Galeria";
+app.controller('GalleryCtrl', function($scope, $state, $http, $ionicModal, $ionicActionSheet, Camera, $cordovaFileTransfer){
+    $scope.title = "Today";
 
+    getPosts();
 
-    $scope.goPost = function (id) {
-        $state.go('tabs.article', {id: id});
+    $scope.goPost = function(id){
+        $state.go('tabs.article', { id: id });
+    };
+
+    function getPosts() {
+        $http.get('http://today.globals.cat/posts').
+            success(function(data, status, headers, config) {
+                // this callback will be called asynchronously
+                // when the response is available
+
+                $scope.dataGet = data;
+                console.log(data.id);
+            }).error(function(data, status, headers, config) {
+                // called asynchronously if an error occurs
+                // or server returns response with an error status.
+                console.log(data);
+
+            });
     }
+
 
     $scope.updateList = function () {
         $http.get('http://today.globals.cat/posts').
@@ -137,9 +156,8 @@ app.controller('GalleryCtrl', function ($scope, $state, $http, $ionicModal, $ion
 
 });
 
-
-app.controller('TodayCtrl', function ($scope, $ionicModal, $ionicSlideBoxDelegate, $ionicActionSheet, $http, $timeout, Camera) {
-    $scope.title = "Today";
+app.controller('TodayCtrl', function($scope, $ionicModal, $ionicSlideBoxDelegate, $ionicActionSheet, $http, $timeout, Camera) {
+    $scope.title = "Galeria";
 
     function getImage() {
 
@@ -152,97 +170,141 @@ app.controller('TodayCtrl', function ($scope, $ionicModal, $ionicSlideBoxDelegat
         });
 
         function onSuccess(imageData) {
-            //alert('OK! ' + imageData);
-            $timeout(function () {
+            console.log('OK! ' + imageData);
+            $timeout(function(){
                 $scope.image = imageData;
                 // TODO: CREAR MENSAJE CARGA //
             }, 1000);
         }
 
         function onFail(message) {
-            alert('Failed because: ' + message);
+            console.log('Failed because: ' + message);
         }
-    };
+    }
 
+    function getImageCam() {
+
+        navigator.camera.getPicture(onSuccess, onFail, {
+
+            destinationType: navigator.camera.DestinationType.FILE_URI,
+            encodingType: navigator.camera.EncodingType.JPEG,
+            sourceType: navigator.camera.PictureSourceType.CAMERA,
+            correctOrientation: true
+
+        });
+
+        function onSuccess(imageURI) {
+            console.log('OK! ' + imageURI);
+            $timeout(function(){
+                $scope.image = images.image;
+            }, 1000);
+        }
+
+        function onFail(message) {
+            console.log('Failed because: ' + message);
+        }
+    }
 
     // Insert new image from camera or gallery //
+
+    $scope.openOptions = function() {
+        $ionicActionSheet.show({
+            buttons: [
+                { text: 'Camara' },
+                { text: 'Imagen desde galeria' }
+            ],
+            titleText: 'Nueva fotografia',
+            cancelText: 'Cancelar',
+            buttonClicked: function(index) {
+                if(index === 0){ // Manual Button
+                    console.log('Camara');
+                    getImageCam();
+                }
+                else if(index === 1){
+                    console.log('Galeria');
+                    getImage();
+                }
+                return true;
+            }
+        });
+    };
 
 
     $ionicModal.fromTemplateUrl('gallery-modal.html', {
         scope: $scope,
         animation: 'slide-in-up'
-    }).then(function (modal) {
+    }).then(function(modal) {
         $scope.modal = modal;
     });
 
-    $scope.openModal = function (index) {
+    $scope.openModal = function(index) {
         $ionicSlideBoxDelegate.slide(index);
         $scope.modal.show();
     };
 
-    $scope.closeModal = function () {
+    $scope.closeModal = function() {
         $scope.modal.hide();
     };
 
     // Cleanup the modal when we're done with it!
-    $scope.$on('$destroy', function () {
+    $scope.$on('$destroy', function() {
         $scope.modal.remove();
     });
     // Execute action on hide modal
-    $scope.$on('modal.hide', function () {
+    $scope.$on('modal.hide', function() {
         // Execute action
     });
     // Execute action on remove modal
-    $scope.$on('modal.removed', function () {
+    $scope.$on('modal.removed', function() {
         // Execute action
     });
-    $scope.$on('modal.shown', function () {
+    $scope.$on('modal.shown', function() {
         console.log('Modal is shown!');
     });
 
     // Call this functions if you need to manually control the slides
-    $scope.next = function () {
+    $scope.next = function() {
         $ionicSlideBoxDelegate.next();
     };
 
-    $scope.previous = function () {
+    $scope.previous = function() {
         $ionicSlideBoxDelegate.previous();
     };
 
-    $scope.goToSlide = function (index) {
+    $scope.goToSlide = function(index) {
         $scope.modal.show();
         $ionicSlideBoxDelegate.slide(index);
-    }
+    };
 
     // Called each time the slide changes
-    $scope.slideChanged = function (index) {
+    $scope.slideChanged = function(index) {
         $scope.slideIndex = index;
     };
 
 });
 
-app.controller('ArticleCtrl', function ($scope, $ionicModal, $ionicSlideBoxDelegate, $http, $stateParams, $timeout) {
-    $scope.title = "Article"
+app.controller('ArticleCtrl', function($scope, $ionicModal, $ionicSlideBoxDelegate, $http, $stateParams, $timeout) {
+    $scope.title = "Today";
 
 
     getPost();
 
     function getPost() {
         $http.get('http://today.globals.cat/posts/' + $stateParams.id).
-            success(function (data, status, headers, config) {
+            success(function(data, status, headers, config) {
                 // this callback will be called asynchronously
                 // when the response is available
                 $scope.data = data;
-                //alert(angular.toJson(data));
-                //alert(data.title);
-                //alert(data.content);
-            }).error(function (data, status, headers, config) {
+                console.log(angular.toJson(data));
+                console.log(data.title);
+                console.log(data.content);
+            }).error(function(data, status, headers, config) {
                 // called asynchronously if an error occurs
                 // or server returns response with an error status.
-                //alert(data);
+                console.log(data);
 
             });
-    };
+    }
 
     function genBrick(i) {
         var height = 300;
@@ -251,7 +313,7 @@ app.controller('ArticleCtrl', function ($scope, $ionicModal, $ionicSlideBoxDeleg
             src: 'http://lorempixel.com/g/280/' + height + '/?' + id,
             index: i
         };
-    };
+    }
 
     $scope.bricks = [
         genBrick(0),
@@ -263,196 +325,194 @@ app.controller('ArticleCtrl', function ($scope, $ionicModal, $ionicSlideBoxDeleg
     $ionicModal.fromTemplateUrl('gallery-modal.html', {
         scope: $scope,
         animation: 'slide-in-up'
-    }).then(function (modal) {
+    }).then(function(modal) {
         $scope.modal = modal;
     });
 
-    $scope.openModal = function (index) {
+    $scope.openModal = function(index) {
         $scope.modal.show();
         $ionicSlideBoxDelegate.slide(index);
     };
 
-    $scope.closeModal = function () {
+    $scope.closeModal = function() {
         $scope.modal.hide();
     };
 
     // Cleanup the modal when we're done with it!
-    $scope.$on('$destroy', function () {
+    $scope.$on('$destroy', function() {
         $scope.modal.remove();
     });
     // Execute action on hide modal
-    $scope.$on('modal.hide', function () {
+    $scope.$on('modal.hide', function() {
         // Execute action
     });
     // Execute action on remove modal
-    $scope.$on('modal.removed', function () {
+    $scope.$on('modal.removed', function() {
         // Execute action
     });
-    $scope.$on('modal.shown', function () {
+    $scope.$on('modal.shown', function() {
         console.log('Modal is shown!');
     });
 
     // Call this functions if you need to manually control the slides
-    $scope.next = function () {
+    $scope.next = function() {
         $ionicSlideBoxDelegate.next();
     };
 
-    $scope.previous = function () {
+    $scope.previous = function() {
         $ionicSlideBoxDelegate.previous();
     };
 
-    $scope.goToSlide = function (index) {
+    $scope.goToSlide = function(index) {
         $scope.modal.show();
         $ionicSlideBoxDelegate.slide(index);
-    }
+    };
 
     // Called each time the slide changes
-    $scope.slideChanged = function (index) {
+    $scope.slideChanged = function(index) {
         $scope.slideIndex = index;
     };
 
 });
 
-app.controller('ProfileCtrl', function ($scope, $ionicModal) {
-    $scope.title = "Info";
+app.controller('ProfileCtrl', function($scope, $ionicModal) {
+    $scope.title = "Informació";
 
     $ionicModal.fromTemplateUrl('login.html', {
         scope: $scope,
         animation: 'slide-in-up'
-    }).then(function (modal) {
+    }).then(function(modal) {
         $scope.modal = modal;
     });
 
-    $scope.openModal = function () {
+    $scope.openModal = function() {
         $scope.modal.show();
     };
 
-    $scope.closeModal = function () {
+    $scope.closeModal = function() {
         $scope.modal.hide();
     };
     // Cleanup the modal when we're done with it!
-    $scope.$on('$destroy', function () {
+    $scope.$on('$destroy', function() {
         $scope.modal.remove();
     });
     // Execute action on hide modal
-    $scope.$on('modal.hide', function () {
+    $scope.$on('modal.hide', function() {
         // Execute action
     });
     // Execute action on remove modal
-    $scope.$on('modal.removed', function () {
+    $scope.$on('modal.removed', function() {
         // Execute action
     });
-    $scope.$on('modal.shown', function () {
+    $scope.$on('modal.shown', function() {
         console.log('Modal is shown!');
     });
 
 });
 
-app.controller('NewPostCtrl', function ($scope, $state, $http, $ionicActionSheet, $cordovaCamera, $cordovaFileTransfer) {
-    $scope.title = "Nuevo Post";
+app.controller('NewPostCtrl', function($scope, $state, $http, $ionicActionSheet, Camera, $cordovaFileTransfer) {
+    $scope.title = "Today";
 
-    newId();
+
 
     function newId() {
-        $http.put('http://today.globals.cat/posts/create').
-            success(function (data, status, headers, config) {
+        $http.post('http://today.globals.cat/posts/create').
+            success(function(data, status, headers, config) {
                 // this callback will be called asynchronously
                 // when the response is available
 
                 $scope.postId = data.id;
-                alert(data.id);
-            }).error(function (data, status, headers, config) {
+                console.log(data.id);
+            }).error(function(data, status, headers, config) {
                 // called asynchronously if an error occurs
                 // or server returns response with an error status.
-                //alert(data);
+                console.log(data);
 
             });
     }
 
-    $scope.newPost = function () {
-
-        //alert($scope.postId);
-        //alert($scope.titlePost);
-        //alert($scope.contentPost);
+    $scope.newPost = function(postId) {
+        newId();
+        console.log(postId);
+        console.log($scope.titlePost);
+        console.log($scope.contentPost);
 
         $http.post("http://today.globals.cat/posts/" + $scope.postId + "/data/upload",
-            {
-                title_post: $scope.titlePost,
-                content_post: $scope.contentPost
-            }).
-            success(function (data, status, headers, config) {
-                //alert("DONE!");
-                //alert(data);
-                //alert(status);
+            {title_post: $scope.titlePost,
+                content_post: $scope.contentPost}).
+            success(function(data, status, headers, config) {
+                console.log("DONE!");
+                console.log(data);
+                console.log(status);
                 // this callback will be called asynchronously
                 // when the response is available
             }).
-            error(function (data, status, headers, config) {
-                //alert("BADD!");
-                //alert(data);
-                //alert(status);
+            error(function(data, status, headers, config) {
+                console.log("BADD!");
+                console.log(data);
+                console.log(status);
                 // called asynchronously if an error occurs
                 // or server returns response with an error status.
             });
 
-    }
+    };
 
-    $scope.openOptions = function ($img) {
+    $scope.openOptions = function($img) {
         $ionicActionSheet.show({
             buttons: [
-                {text: 'Camara'},
-                {text: 'Imagen desde galeria'}
+                { text: 'Camara' },
+                { text: 'Imagen desde galeria' }
             ],
             titleText: 'Nueva fotografia',
             cancelText: 'Cancelar',
-            buttonClicked: function (index) {
-                if (index === 0) { // Manual Button
-                    alert('Camara ' + $img);
-                    Camera.getPicture({
-                        correctOrientation: true,
+            buttonClicked: function(index) {
+                if(index === 0){ // Manual Button
+                    console.log('Camara ' + $img);
+                    Camera.getPicture({correctOrientation: true,
                         quality: 40,
-                        destinationType: Camera.DestinationType.DATA_URL,
-                        encodingType: Camera.EncodingType.JPEG
-                    }).then(function (imageData) {
+                        destinationType: navigator.camera.DestinationType.FILE_URI,
+                        encodingType: navigator.camera.EncodingType.JPEG}).then(function(imageData) {
 
-                        var options = {
-                            fileKey: $img,
-                            fileName: imageData.substr(imageData.lastIndexOf('/') + 1)
-                        };
+                        upload();
+
+                        function upload() {
+
+                            var options = {
+                                fileKey: $img,
+                                fileName: imageData.substr(imageData.lastIndexOf('/')+1)
+                            };
+
+                            $cordovaFileTransfer.upload("http://today.globals.cat/posts/" + $scope.postId + "/images/upload", imageData, options).then(function(result) {
+                                console.log("SUCCESS: " + JSON.stringify(result.response));
+                            }, function(err) {
+                                console.log("ERROR: " + JSON.stringify(err));
+                            }, function (progress) {
+                                console.log("EN PROCESO!");
+                            });
+                        }
 
 
-                        $cordovaFileTransfer.upload("http://today.globals.cat/posts/" + $scope.postId + "/images/upload", imageData, options).then(function (result) {
-                            alert("SUCCESS: " + JSON.stringify(result.response));
-                        }, function (err) {
-                            alert("ERROR: " + JSON.stringify(err));
-                        }, function (progress) {
-                            alert("EN PROCESO!");
-                        });
-
-
-                        if ($img === 'principal') {
+                        if($img === 'principal'){
                             $scope.imagePrinc = imageData;
-                        } else if ($img === 'img1') {
+                        } else if($img === 'img1'){
                             $scope.image1 = imageData;
-                        } else if ($img === 'img2') {
+                        } else if($img === 'img2'){
                             $scope.image2 = imageData;
-                        } else if ($img === 'img3') {
+                        } else if($img === 'img3'){
                             $scope.image3 = imageData;
                         }
 
-                    }, function (err) {
+                    }, function(err) {
                         console.err(err);
                     })
 
-                } else if (index === 1) {
-                    alert('Galeria');
+                } else if(index === 1){
+                    console.log('Galeria');
 
-                    Camera.getPicture({
-                        correctOrientation: true,
+                    Camera.getPicture({correctOrientation: true,
                         quality: 40,
                         destinationType: Camera.DestinationType.FILE_URI,
-                        sourceType: Camera.PictureSourceType.PHOTOLIBRARY
-                    }).then(function (imageData) {
+                        sourceType: Camera.PictureSourceType.PHOTOLIBRARY}).then(function(imageData) {
 
                         uploadPhoto();
 
@@ -460,34 +520,33 @@ app.controller('NewPostCtrl', function ($scope, $state, $http, $ionicActionSheet
 
                             var options = {
                                 fileKey: $img,
-                                fileName: imageData.substr(imageData.lastIndexOf('/') + 1)
+                                fileName: imageData.substr(imageData.lastIndexOf('/')+1)
                             };
 
-                            $cordovaFileTransfer.upload("http://today.globals.cat/posts/" + $scope.postId + "/images/upload", imageData, options).then(function (result) {
-                                alert("SUCCESS: " + JSON.stringify(result.response));
-                            }, function (err) {
-                                alert("ERROR: " + JSON.stringify(err));
+                            $cordovaFileTransfer.upload("http://today.globals.cat/posts/" + $scope.postId + "/images/upload", imageData, options).then(function(result) {
+                                console.log("SUCCESS: " + JSON.stringify(result.response));
+                            }, function(err) {
+                                console.log("ERROR: " + JSON.stringify(err));
                             }, function (progress) {
-                                alert("EN PROCESO!");
+                                console.log("EN PROCESO!");
                             });
                         }
 
 
-                        if ($img === 'principal') {
+                        if($img === 'principal'){
                             $scope.imagePrinc = imageData;
-                        } else if ($img === 'img1') {
+                        } else if($img === 'img1'){
                             $scope.image1 = imageData;
-                        } else if ($img === 'img2') {
+                        } else if($img === 'img2'){
                             $scope.image2 = imageData;
-                        } else if ($img === 'img3') {
+                        } else if($img === 'img3'){
                             $scope.image3 = imageData;
                         }
 
-                    }, function (err) {
+                    }, function(err) {
                         console.err(err);
                     });
                 }
-                ;
             }
         });
     }
