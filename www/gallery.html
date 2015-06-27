@@ -1,0 +1,37 @@
+<ion-view title="Today">
+
+    <ion-nav-buttons side="right">
+
+        <a class="button button-icon ion-plus-round header-button" href="#/tabs/new-post"></a>
+
+    </ion-nav-buttons>
+
+    <!-- <ion-nav-buttons side="right">
+
+      <button class="button button-icon ion-android-calendar header-button"></button>
+
+    </ion-nav-buttons> -->
+
+    <ion-content has-bouncing="true">
+
+        <ion-refresher on-refresh="updateList()"></ion-refresher>
+
+        <div class="list card" ng-repeat="data in dataGet">
+
+            <ion-item class="list card" item="item"
+                      ng-click="goPost({{ data.id }})">
+
+                <div class="item item-image">
+                    <img class="card-image" src="http://today.globals.cat/uploads/{{data.principal}}">
+                </div>
+
+                <div class="item item-text-wrap">
+                    <h10>{{ data.title }}</h10>
+                    <p class="card-text">{{data.content | limitTo: 136}} {{ data.content > 200 ? '&hellip;' : '[...]'
+                        }}</p>
+                </div>
+            </ion-item>
+            <!-- card-image -->
+        </div>
+    </ion-content>
+</ion-view>

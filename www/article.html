@@ -1,0 +1,32 @@
+<ion-view title="Today">
+
+    <ion-header-bar class="bar bar-assertive">
+        <div class="buttons">
+            <button class="button button-clear icon ion-edit header-button"></button>
+        </div>
+        <div class="buttons">
+            <button class="button button-clear icon ion-close-round header-button" ng-click=""></button>
+        </div>
+    </ion-header-bar>
+
+    <ion-content has-bouncing="true">
+        <div class="list card">
+
+            <div class="item item-image">
+                <img class="" ng-src="http://today.globals.cat/uploads/{{data.principal}}" />
+            </div>
+
+            <div class="item item-text-wrap">
+              <h10 class="modal-h10">{{ data.title }}</h10>
+              <p class="card-text">{{ data.content }}</p>
+            </div>
+
+            <div class="masonry-article">
+                    <img class="item-masonry-article" ng-src="http://today.globals.cat/uploads/{{data.img1}}" ng-click="openModal({{ brick.index }})" />
+                    <img class="item-masonry-article" ng-src="http://today.globals.cat/uploads/{{data.img2}}" ng-click="openModal({{ brick.index }})" />
+                    <img class="item-masonry-article" ng-src="http://today.globals.cat/uploads/{{data.img3}}" ng-click="openModal({{ brick.index }})" />
+
+            </div>
+        </div>
+    </ion-content>
+</ion-view>

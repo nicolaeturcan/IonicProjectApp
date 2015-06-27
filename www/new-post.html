@@ -1,0 +1,40 @@
+<ion-view title="{{title}}">
+
+    <ion-content has-bouncing="true">
+
+        <div class="container4">
+            <input name="postId" id="{{ postId }}" type="hidden">
+        <table>
+            <tr>
+                <td style="vertical-align:top"><a ng-click="openOptions('principal')"><div style="height:0;"><img ng-src="{{imagePrinc}}" src="img/photo.png" alt="" height="221" max-width="100%"></div></a></td>
+                <td><a ng-click="openOptions('img1')"><img ng-src="{{image1}}" src="img/photo.png" style="margin-left: 4px;" height="70" width="70"/></a></td>
+            </tr>
+            <tr>
+                <td><!--empty--></td>
+                <td><a ng-click="openOptions('img2')"><img ng-src="{{image2}}" src="img/photo.png" style="margin-left: 4px;" height="70" width="70"/></a></td>
+            </tr>
+            <tr>
+                <td><!--empty--></td>
+                <td><a ng-click="openOptions('img3')"><img ng-src="{{image3}}" src="img/photo.png" style="margin-left: 4px;" height="70" width="70"/></a></td>
+            </tr>
+        </table>
+        </div>
+        <h11>Titulo</h11>
+        <textarea ng-model="$parent.titlePost" name="titlePost" placeholder="Introducir el titulo" type="text"></textarea>
+        <h11>Descripcion</h11>
+        <textarea ng-model="$parent.contentPost" name="contentPost" placeholder="Introducir la descripcion" type="text"></textarea>
+        <li class="item item-toggle">
+	     HTML5
+	     <label class="toggle toggle-assertive">
+	       <input type="checkbox">
+	       <div class="track">
+	         <div class="handle"></div>
+	       </div>
+	     </label>
+	  	</li>
+        
+        <a class="button button-block button-balanced icon icon-left ion-android-done-all" ng-click="newPost()">Enviar</a>
+        
+    </ion-content>
+
+</ion-view>
