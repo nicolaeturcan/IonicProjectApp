@@ -410,7 +410,7 @@ app.controller('ProfileCtrl', function($scope, $ionicModal) {
 
 });
 
-app.controller('NewPostCtrl', function($scope, $state, $http, $ionicActionSheet, Camera, $cordovaFileTransfer) {
+app.controller('NewPostCtrl', function($scope, $state, $http, $ionicActionSheet, Camera, $cordovaFileTransfer, $ionicPopup, $timeout) {
     $scope.title = "Today";
 
     $scope.newPost = function() {
@@ -456,6 +456,21 @@ app.controller('NewPostCtrl', function($scope, $state, $http, $ionicActionSheet,
                             console.log(status);
                             // this callback will be called asynchronously
                             // when the response is available
+
+
+                            $scope.showAlert = function() {
+                                var alertPopup = $ionicPopup.alert({
+                                    title: 'Registre afegit!',
+                                    template: 'S\'ha afegit un registre nou satisfactòriament.'
+                                });
+                                alertPopup.then(function(res) {
+                                    console.log('Alerta realitzada satisfactòriament.');
+
+                                });
+                            };
+
+                            $scope.showAlert();
+
                         }).
                         error(function (data, status, headers, config) {
                             console.log("BADD!");
