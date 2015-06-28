@@ -413,47 +413,46 @@ app.controller('ProfileCtrl', function($scope, $ionicModal) {
 app.controller('NewPostCtrl', function($scope, $state, $http, $ionicActionSheet, Camera, $cordovaFileTransfer) {
     $scope.title = "Today";
 
+    $scope.newPost = function() {
 
-
-    function newId() {
         $http.post('http://today.globals.cat/posts/create').
             success(function(data, status, headers, config) {
                 // this callback will be called asynchronously
                 // when the response is available
 
-                $scope.postId = data.id;
-                console.log(data.id);
+                //var postId = data.id;
+                //console.log(data.id);
+
+                console.log($scope.postId);
+                console.log($scope.titlePost);
+                console.log($scope.contentPost);
+
+                $http.post("http://today.globals.cat/posts/" + $scope.postId + "/data/upload",
+                    {title_post: $scope.titlePost,
+                        content_post: $scope.contentPost}).
+                    success(function(data, status, headers, config) {
+                        console.log("DONE!");
+                        console.log(data);
+                        console.log(status);
+                        // this callback will be called asynchronously
+                        // when the response is available
+                    }).
+                    error(function(data, status, headers, config) {
+                        console.log("BADD!");
+                        console.log(data);
+                        console.log(status);
+                        // called asynchronously if an error occurs
+                        // or server returns response with an error status.
+                    });
+
             }).error(function(data, status, headers, config) {
                 // called asynchronously if an error occurs
                 // or server returns response with an error status.
                 console.log(data);
 
             });
-    }
 
-    $scope.newPost = function(postId) {
-        newId();
-        console.log(postId);
-        console.log($scope.titlePost);
-        console.log($scope.contentPost);
 
-        $http.post("http://today.globals.cat/posts/" + $scope.postId + "/data/upload",
-            {title_post: $scope.titlePost,
-                content_post: $scope.contentPost}).
-            success(function(data, status, headers, config) {
-                console.log("DONE!");
-                console.log(data);
-                console.log(status);
-                // this callback will be called asynchronously
-                // when the response is available
-            }).
-            error(function(data, status, headers, config) {
-                console.log("BADD!");
-                console.log(data);
-                console.log(status);
-                // called asynchronously if an error occurs
-                // or server returns response with an error status.
-            });
 
     };
 
