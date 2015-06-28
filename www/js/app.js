@@ -1,5 +1,5 @@
 
-var app = angular.module('navApp', ['ionic', 'swipe', 'wu.masonry', 'ab-base64', 'base64', 'ui.router', 'ngCordova', 'ngCordova.plugins.fileTransfer', 'ngRoute'])
+var app = angular.module('navApp', ['ionic', 'swipe', 'wu.masonry', 'ab-base64', 'base64', 'ui.router', 'ngCordova', 'ngCordova.plugins.fileTransfer', 'ngRoute']);
 
 /*app.run(function($cordovaStatusbar) {
 
@@ -415,46 +415,60 @@ app.controller('NewPostCtrl', function($scope, $state, $http, $ionicActionSheet,
 
     $scope.newPost = function() {
 
-        $http.post('http://today.globals.cat/posts/create').
-            success(function(data, status, headers, config) {
-                // this callback will be called asynchronously
-                // when the response is available
+            // Create new id
 
-                //var postId = data.id;
-                //console.log(data.id);
+            $http.post('http://today.globals.cat/posts/create').
+                success(function (data, status, headers, config) {
+                    // this callback will be called asynchronously
+                    // when the response is available
 
-                console.log($scope.postId);
-                console.log($scope.titlePost);
-                console.log($scope.contentPost);
+                    //var postId = data.id;
+                    //console.log(data.id);
 
-                $http.post("http://today.globals.cat/posts/" + $scope.postId + "/data/upload",
-                    {title_post: $scope.titlePost,
-                        content_post: $scope.contentPost}).
-                    success(function(data, status, headers, config) {
-                        console.log("DONE!");
-                        console.log(data);
-                        console.log(status);
-                        // this callback will be called asynchronously
-                        // when the response is available
-                    }).
-                    error(function(data, status, headers, config) {
-                        console.log("BADD!");
-                        console.log(data);
-                        console.log(status);
-                        // called asynchronously if an error occurs
-                        // or server returns response with an error status.
-                    });
-
-            }).error(function(data, status, headers, config) {
-                // called asynchronously if an error occurs
-                // or server returns response with an error status.
-                console.log(data);
-
-            });
+                    console.log($scope.postId =  data.id);
+                    console.log($scope.titlePost);
+                    console.log($scope.contentPost);
+                    console.log($scope.NameOfPrincipal);
+                    console.log($scope.NameOfImage1);
+                    console.log($scope.NameOfImage2);
+                    console.log($scope.NameOfImage3);
 
 
+                    // Create new entry
 
+                    $http.post("http://today.globals.cat/posts/" + $scope.postId + "/data/upload",
+                        {
+                            title_post: $scope.titlePost,
+                            content_post: $scope.contentPost,
+                            principal_post: $scope.NameOfPrincipal,
+                            img1_post: $scope.NameOfImage1,
+                            img2_post: $scope.NameOfImage2,
+                            img3_post: $scope.NameOfImage3
+                        }).
+                        success(function (data, status, headers, config) {
+                            console.log("DONE!");
+                            console.log(data);
+                            console.log(status);
+                            // this callback will be called asynchronously
+                            // when the response is available
+                        }).
+                        error(function (data, status, headers, config) {
+                            console.log("BADD!");
+                            console.log(data);
+                            console.log(status);
+                            // called asynchronously if an error occurs
+                            // or server returns response with an error status.
+                        });
+
+                }).error(function (data, status, headers, config) {
+                    // called asynchronously if an error occurs
+                    // or server returns response with an error status.
+                    console.log(data);
+
+                });
     };
+
+
 
     $scope.openOptions = function($img) {
         $ionicActionSheet.show({
@@ -472,16 +486,18 @@ app.controller('NewPostCtrl', function($scope, $state, $http, $ionicActionSheet,
                         destinationType: navigator.camera.DestinationType.FILE_URI,
                         encodingType: navigator.camera.EncodingType.JPEG}).then(function(imageData) {
 
+                        var filename = imageData.substr(imageData.lastIndexOf('/'));
+
                         upload();
 
                         function upload() {
 
                             var options = {
                                 fileKey: $img,
-                                fileName: imageData.substr(imageData.lastIndexOf('/')+1)
+                                fileName: imageData.substr(imageData.lastIndexOf('/'))
                             };
 
-                            $cordovaFileTransfer.upload("http://today.globals.cat/posts/" + $scope.postId + "/images/upload", imageData, options).then(function(result) {
+                            $cordovaFileTransfer.upload("http://today.globals.cat/posts/" + $scope.postId + filename + "/upload", imageData, options).then(function(result) {
                                 console.log("SUCCESS: " + JSON.stringify(result.response));
                             }, function(err) {
                                 console.log("ERROR: " + JSON.stringify(err));
@@ -493,12 +509,19 @@ app.controller('NewPostCtrl', function($scope, $state, $http, $ionicActionSheet,
 
                         if($img === 'principal'){
                             $scope.imagePrinc = imageData;
+                            $scope.NameOfPrincipal= filename;
+
                         } else if($img === 'img1'){
                             $scope.image1 = imageData;
+                            $scope.NameOfImage1 = filename;
+
                         } else if($img === 'img2'){
                             $scope.image2 = imageData;
+                            $scope.NameOfImage2 = filename;
+
                         } else if($img === 'img3'){
                             $scope.image3 = imageData;
+                            $scope.NameOfImage3 = filename;
                         }
 
                     }, function(err) {
