@@ -1,5 +1,5 @@
 
-var app = angular.module('navApp', ['ionic', 'swipe', 'wu.masonry', 'ab-base64', 'base64', 'ui.router', 'ngCordova', 'ngCordova.plugins.fileTransfer', 'ngRoute']);
+var app = angular.module('navApp', ['ionic', 'swipe', 'wu.masonry', 'ab-base64', 'base64', 'ui.router', 'ngCordova', 'ngCordova.plugins.fileTransfer', 'ngRoute'])
 
 /*app.run(function($cordovaStatusbar) {
 
@@ -428,23 +428,28 @@ app.controller('NewPostCtrl', function($scope, $state, $http, $ionicActionSheet,
                     console.log($scope.postId =  data.id);
                     console.log($scope.titlePost);
                     console.log($scope.contentPost);
-                    console.log($scope.NameOfPrincipal);
-                    console.log($scope.NameOfImage1);
-                    console.log($scope.NameOfImage2);
-                    console.log($scope.NameOfImage3);
+                    console.log($scope.nameOfPrincipal);
+                    console.log($scope.nameOfImage1);
+                    console.log($scope.nameOfImage2);
+                    console.log($scope.nameOfImage3);
 
 
                     // Create new entry
 
-                    $http.post("http://today.globals.cat/posts/" + $scope.postId + "/data/upload",
-                        {
-                            title_post: $scope.titlePost,
-                            content_post: $scope.contentPost,
-                            principal_post: $scope.NameOfPrincipal,
-                            img1_post: $scope.NameOfImage1,
-                            img2_post: $scope.NameOfImage2,
-                            img3_post: $scope.NameOfImage3
-                        }).
+                    var url = "http://today.globals.cat/posts/"+ $scope.postId +"/add/data";
+
+                    var post_data ={
+                        title_post: $scope.titlePost,
+                        content_post: $scope.contentPost,
+                        principal_post: $scope.nameOfPrincipal,
+                        img1_post: $scope.nameOfImage1,
+                        img2_post: $scope.nameOfImage2,
+                        img3_post: $scope.nameOfImage3
+                    };
+
+                    console.log(post_data);
+
+                    $http.post(url, post_data).
                         success(function (data, status, headers, config) {
                             console.log("DONE!");
                             console.log(data);
@@ -486,7 +491,7 @@ app.controller('NewPostCtrl', function($scope, $state, $http, $ionicActionSheet,
                         destinationType: navigator.camera.DestinationType.FILE_URI,
                         encodingType: navigator.camera.EncodingType.JPEG}).then(function(imageData) {
 
-                        var filename = imageData.substr(imageData.lastIndexOf('/'));
+                        var filename = imageData.replace(/^.*[\\\/]/, '');
 
                         upload();
 
@@ -497,7 +502,7 @@ app.controller('NewPostCtrl', function($scope, $state, $http, $ionicActionSheet,
                                 fileName: imageData.substr(imageData.lastIndexOf('/'))
                             };
 
-                            $cordovaFileTransfer.upload("http://today.globals.cat/posts/" + $scope.postId + filename + "/upload", imageData, options).then(function(result) {
+                            $cordovaFileTransfer.upload("http://today.globals.cat/posts/" + $scope.postId + "/" + filename + "/upload", imageData, options).then(function(result) {
                                 console.log("SUCCESS: " + JSON.stringify(result.response));
                             }, function(err) {
                                 console.log("ERROR: " + JSON.stringify(err));
@@ -509,19 +514,20 @@ app.controller('NewPostCtrl', function($scope, $state, $http, $ionicActionSheet,
 
                         if($img === 'principal'){
                             $scope.imagePrinc = imageData;
-                            $scope.NameOfPrincipal= filename;
+                            $scope.nameOfPrincipal= filename;
 
                         } else if($img === 'img1'){
                             $scope.image1 = imageData;
-                            $scope.NameOfImage1 = filename;
+                            $scope.nameOfImage1 = filename;
 
                         } else if($img === 'img2'){
                             $scope.image2 = imageData;
-                            $scope.NameOfImage2 = filename;
+                            $scope.nameOfImage2 = filename;
 
                         } else if($img === 'img3'){
                             $scope.image3 = imageData;
-                            $scope.NameOfImage3 = filename;
+                            $scope.nameOfImage3 = filename;
+
                         }
 
                     }, function(err) {

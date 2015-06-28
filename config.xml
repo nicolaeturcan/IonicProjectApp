@@ -9,7 +9,7 @@
         Globals
     </author>
     <content src="index.html"/>
-    <access origin="*"/>
+    <access origin="*" subdomains="true"/>
     <allow-navigation href="http://*/*" />
     <allow-navigation href="https://*/*" />
     <allow-navigation href="data:*" />
