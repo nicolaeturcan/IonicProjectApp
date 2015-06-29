@@ -117,7 +117,7 @@ app.controller('GalleryCtrl', function($scope, $state, $http, $ionicModal, $ioni
                 // when the response is available
 
                 $scope.dataGet = data;
-                console.log(data.id);
+                console.log(data[0].id);
             }).error(function(data, status, headers, config) {
                 // called asynchronously if an error occurs
                 // or server returns response with an error status.
@@ -125,6 +125,33 @@ app.controller('GalleryCtrl', function($scope, $state, $http, $ionicModal, $ioni
 
             });
     }
+
+
+    $scope.getGallery = function () {
+        $http.get('http://today.globals.cat/posts/gallery').
+            success(function(data, status, headers, config) {
+                var array = [];
+                i2 = 0;
+                //$scope.data_gallery = data;
+                for(i = 0; i < data.length; i++){
+                    for (key in data[i]) {
+                        if (data[i].hasOwnProperty(key)){
+                            //console.log(data[i][key]);
+
+                            $scope.array[i2++] = data[i][key];
+                        }
+                    }
+                    //console.log(data[i].length);
+                }
+               console.log(array);
+
+            }).error(function(data, status, headers, config) {
+                // called asynchronously if an error occurs
+                // or server returns response with an error status.
+                console.log(data);
+
+            });
+    };
 
 
     $scope.updateList = function () {
@@ -150,6 +177,7 @@ app.controller('GalleryCtrl', function($scope, $state, $http, $ionicModal, $ioni
 
     $scope.init = function () {
         $scope.updateList();
+        $scope.getGallery();
     };
 
     $scope.init();
