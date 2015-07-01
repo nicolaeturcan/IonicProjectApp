@@ -672,10 +672,14 @@ app.controller('NewPostCtrl', function ($scope, $state, $http, $ionicActionSheet
                             alertPopup.then(function (res) {
                                 console.log('Alerta realitzada satisfactòriament.');
 
+                                //$location.path("/tabs/gallery");
+                                $state.go('tabs.gallery');
+
                             });
                         };
 
                         $scope.showAlert();
+
 
                     }).
                     error(function (data, status, headers, config) {
@@ -820,7 +824,6 @@ app.controller('NewPostCtrl', function ($scope, $state, $http, $ionicActionSheet
                                     console.log("EN PROCESO!");
                                 });
                             }
-
 
                             if ($img === 'principal') {
                                 $scope.imagePrinc = imageData;
