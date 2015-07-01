@@ -16,6 +16,8 @@ app.config(function ($stateProvider, $urlRouterProvider, $ionicConfigProvider, $
     $ionicConfigProvider.tabs.style("standard");
     $ionicConfigProvider.navBar.alignTitle("center");
     $ionicConfigProvider.backButton.text('').icon('ion-chevron-left').previousTitleText(false);
+    $compileProvider.imgSrcSanitizationWhitelist(/^\s*(https?|ftp|mailto|content):/);
+    //$compileProvider.imgSrcSanitizationWhitelist(/^\s*(https?|ftp|mailto|file|tel):/);
 
     $urlRouterProvider.otherwise('/tabs/gallery');
 
@@ -86,7 +88,6 @@ app.config(function ($stateProvider, $urlRouterProvider, $ionicConfigProvider, $
         }
     });
 
-    $compileProvider.imgSrcSanitizationWhitelist(/^\s*(https?|ftp|mailto|file|tel):/);
 });
 
 app.factory('Camera', ['$q', function ($q) {
@@ -119,21 +120,21 @@ app.controller('GalleryCtrl', function ($scope, $state, $http, $ionicModal, $ion
         $state.go('tabs.article', {id: id});
     };
 
-   /* function getPosts() {
-        $http.get('http://today.globals.cat/posts').
-            success(function (data, status, headers, config) {
-                // this callback will be called asynchronously
-                // when the response is available
+    /* function getPosts() {
+     $http.get('http://today.globals.cat/posts').
+     success(function (data, status, headers, config) {
+     // this callback will be called asynchronously
+     // when the response is available
 
-                $scope.dataGet = data;
-                console.log(data[0].id);
-            }).error(function (data, status, headers, config) {
-                // called asynchronously if an error occurs
-                // or server returns response with an error status.
-                console.log(data);
+     $scope.dataGet = data;
+     console.log(data[0].id);
+     }).error(function (data, status, headers, config) {
+     // called asynchronously if an error occurs
+     // or server returns response with an error status.
+     console.log(data);
 
-            });
-    }*/
+     });
+     }*/
 
 
     $scope.updateList = function () {
@@ -204,11 +205,11 @@ app.controller('GalleryCtrl', function ($scope, $state, $http, $ionicModal, $ion
     };
 
     // Actualitza l'estat de la vista cada vegada que s'accedeix a ella.
-    $scope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState, fromParams){
-        if (toState.name == 'tabs.gallery'){
+/*    $scope.$on('$stateChangeSuccess', function (event, toState, toParams, fromState, fromParams) {
+        if (toState.name == 'tabs.gallery') {
             $scope.updateList();
         }
-    });
+    });*/
 
     $scope.init();
 
@@ -252,11 +253,11 @@ app.controller('TodayCtrl', function ($scope, $ionicModal, $ionicSlideBoxDelegat
             });
     };
 
-    $scope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState, fromParams){
-        if (toState.name == 'tabs.today'){
+  /*  $scope.$on('$stateChangeSuccess', function (event, toState, toParams, fromState, fromParams) {
+        if (toState.name == 'tabs.today') {
             $scope.getGallery();
         }
-    });
+    });*/
 
     $scope.init = function () {
         $scope.getGallery();
@@ -264,7 +265,6 @@ app.controller('TodayCtrl', function ($scope, $ionicModal, $ionicSlideBoxDelegat
     };
 
     $scope.init();
-
 
 
     function getImage() {
@@ -323,6 +323,9 @@ app.controller('TodayCtrl', function ($scope, $ionicModal, $ionicSlideBoxDelegat
             ],
             titleText: 'Nueva fotografia',
             cancelText: 'Cancelar',
+            cancel: function() {
+                    hideSheet();
+            },
             buttonClicked: function (index) {
                 if (index === 0) { // Manual Button
                     console.log('Camara');
@@ -330,7 +333,9 @@ app.controller('TodayCtrl', function ($scope, $ionicModal, $ionicSlideBoxDelegat
                 }
                 else if (index === 1) {
                     console.log('Galeria');
-                    getImage();
+
+                    alert();
+                    //getImage();
                 }
                 return true;
             }
@@ -692,12 +697,15 @@ app.controller('NewPostCtrl', function ($scope, $state, $http, $ionicActionSheet
 
     $scope.openOptions = function ($img) {
         $ionicActionSheet.show({
+            titleText: 'Afegir Imatge Nova',
             buttons: [
-                {text: 'Camara'},
-                {text: 'Imagen desde galeria'}
+                {text: '<i class="icon ion-camera"></i> Càmera'},
+                {text: '<i class="icon ion-images"></i> Galeria'}
             ],
-            titleText: 'Nueva fotografia',
             cancelText: 'Cancelar',
+            cancel: function() {
+                console.log('CANCELLED');
+            },
             buttonClicked: function (index) {
                 if (index === 0) { // Manual Button
                     console.log('Camara ' + $img);
@@ -754,45 +762,87 @@ app.controller('NewPostCtrl', function ($scope, $state, $http, $ionicActionSheet
                 } else if (index === 1) {
                     console.log('Galeria');
 
+
+                    /*               $scope.showAlert = function () {
+                     var alertPopup = $ionicPopup.alert({
+                     title: 'Opció no disponible!',
+                     template: 'Aquesta opció serà disponible en la pròxima actualització'
+                     });
+                     alertPopup.then(function (res) {
+                     console.log('Alerta realitzada satisfactòriament.');
+
+                     });
+                     };
+
+                     $scope.showAlert();*/
+
+
                     Camera.getPicture({
                         correctOrientation: true,
                         quality: 40,
-                        destinationType: Camera.DestinationType.FILE_URI,
-                        sourceType: Camera.PictureSourceType.PHOTOLIBRARY
+                        destinationType: navigator.camera.DestinationType.NATIVE_URI,
+                        sourceType: navigator.camera.PictureSourceType.PHOTOLIBRARY,
+                        allowEdit: false,
+                        encodingType: navigator.camera.EncodingType.JPEG,
+                        popoverOptions: CameraPopoverOptions,
+                        saveToPhotoAlbum: false
+
+
                     }).then(function (imageData) {
 
-                        uploadPhoto();
+                        console.log("before replace", imageData);
 
-                        function uploadPhoto() {
 
-                            var options = {
-                                fileKey: $img,
-                                fileName: imageData.substr(imageData.lastIndexOf('/') + 1)
-                            };
-
-                            $cordovaFileTransfer.upload("http://today.globals.cat/posts/" + $scope.postId + "/images/upload", imageData, options).then(function (result) {
-                                console.log("SUCCESS: " + JSON.stringify(result.response));
-                            }, function (err) {
-                                console.log("ERROR: " + JSON.stringify(err));
-                            }, function (progress) {
-                                console.log("EN PROCESO!");
-                            });
+                        if (imageData.substring(0,21)=="content://com.android") {
+                            photo_split = imageData.split("%3A");
+                            filename= photo_split[1] + ".jpg";
+                        }else{
+                            var filename = imageData.replace(/^.*[\\\/]/, '');
                         }
 
 
-                        if ($img === 'principal') {
-                            $scope.imagePrinc = imageData;
-                        } else if ($img === 'img1') {
-                            $scope.image1 = imageData;
-                        } else if ($img === 'img2') {
-                            $scope.image2 = imageData;
-                        } else if ($img === 'img3') {
-                            $scope.image3 = imageData;
-                        }
+                        console.log("after replace", filename);
 
-                    }, function (err) {
-                        console.err(err);
-                    });
+                            upload();
+
+                            function upload() {
+
+                                var options = {
+                                    fileKey: $img,
+                                    fileName: imageData.substr(imageData.lastIndexOf('/'))
+                                };
+
+                                $cordovaFileTransfer.upload("http://today.globals.cat/posts/" + $scope.postId + "/" + filename + "/upload", imageData, options).then(function (result) {
+                                    console.log("SUCCESS: " + JSON.stringify(result.response));
+                                }, function (err) {
+                                    console.log("ERROR: " + JSON.stringify(err));
+                                }, function (progress) {
+                                    console.log("EN PROCESO!");
+                                });
+                            }
+
+
+                            if ($img === 'principal') {
+                                $scope.imagePrinc = imageData;
+                                $scope.nameOfPrincipal = filename;
+
+                            } else if ($img === 'img1') {
+                                $scope.image1 = imageData;
+                                $scope.nameOfImage1 = filename;
+
+                            } else if ($img === 'img2') {
+                                $scope.image2 = imageData;
+                                $scope.nameOfImage2 = filename;
+
+                            } else if ($img === 'img3') {
+                                $scope.image3 = imageData;
+                                $scope.nameOfImage3 = filename;
+
+                            }
+
+                        }, function (err) {
+                            console.err(err);
+                        })
                 }
             }
         });
