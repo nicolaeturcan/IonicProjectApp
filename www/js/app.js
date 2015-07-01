@@ -1,4 +1,4 @@
-var app = angular.module('navApp', ['ionic', 'swipe', 'wu.masonry', 'ab-base64', 'base64', 'ui.router', 'ngCordova', 'ngCordova.plugins.fileTransfer', 'ngRoute'])
+var app = angular.module('navApp', ['ionic', 'swipe', 'wu.masonry', 'ab-base64', 'base64', 'ui.router', 'ngCordova', 'ngCordova.plugins.fileTransfer', 'ngRoute', 'ngCookies'])
 
 /*app.run(function($cordovaStatusbar) {
 
@@ -8,7 +8,7 @@ var app = angular.module('navApp', ['ionic', 'swipe', 'wu.masonry', 'ab-base64',
  $cordovaStatusbar.styleHex('#b73e2a');
 
  })*/
-
+//var loguejat;
 // RUTAS
 app.config(function ($stateProvider, $urlRouterProvider, $ionicConfigProvider, $compileProvider) {
 
@@ -110,16 +110,16 @@ app.factory('Camera', ['$q', function ($q) {
 
 // CONTROLADORES
 
-app.controller('GalleryCtrl', function ($scope, $state, $http, $ionicModal, $ionicActionSheet, Camera, $cordovaFileTransfer) {
+app.controller('GalleryCtrl', function ($scope, $state, $http, $ionicModal, $ionicActionSheet, Camera, $cordovaFileTransfer, $cookies, auth, $rootScope) {
     $scope.title = "Today";
 
-    getPosts();
+    //getPosts();
 
     $scope.goPost = function (id) {
         $state.go('tabs.article', {id: id});
     };
 
-    function getPosts() {
+   /* function getPosts() {
         $http.get('http://today.globals.cat/posts').
             success(function (data, status, headers, config) {
                 // this callback will be called asynchronously
@@ -133,7 +133,7 @@ app.controller('GalleryCtrl', function ($scope, $state, $http, $ionicModal, $ion
                 console.log(data);
 
             });
-    }
+    }*/
 
 
     $scope.updateList = function () {
@@ -154,7 +154,48 @@ app.controller('GalleryCtrl', function ($scope, $state, $http, $ionicModal, $ion
 
                 // Stops Pull to refrash scroll
                 $scope.$broadcast('scroll.refreshComplete');
+                console.log($rootScope.loged);
+
             });
+    };
+    $rootScope.loged = false;
+    //$scope.loged = false;
+
+    $scope.login = function ($username, $password) {
+        auth.login($username, $password);
+
+        var url = "http://today.globals.cat/authentication/" + $cookies.username + "/" + $cookies.password;
+
+        //console.log(post_data);
+        console.log($cookies.username);
+        console.log($cookies.password);
+
+        if (typeof($cookies.username) != 'undefined') {
+            $http
+            ({
+                method: 'POST',
+                url: url,
+                //data: post_data,
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+            }).
+                success(function (data, status, headers, config) {
+                    $rootScope.loged = true;
+
+
+                    console.log($scope.loged);
+                    console.log("Post status: ", status);
+                }).
+                error(function (data, status, headers, config) {
+                    console.log("Error!");
+                    console.log(status, data);
+                });
+        }
+    };
+
+    $scope.logout = function () {
+        auth.logout();
+        $rootScope.loged = false;
+
     };
 
     $scope.init = function () {
@@ -162,13 +203,19 @@ app.controller('GalleryCtrl', function ($scope, $state, $http, $ionicModal, $ion
         //$scope.getGallery();
     };
 
+    // Actualitza l'estat de la vista cada vegada que s'accedeix a ella.
+    $scope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState, fromParams){
+        if (toState.name == 'tabs.gallery'){
+            $scope.updateList();
+        }
+    });
+
     $scope.init();
 
 });
 
 app.controller('TodayCtrl', function ($scope, $ionicModal, $ionicSlideBoxDelegate, $ionicActionSheet, $http, $timeout, Camera) {
     $scope.title = "Galeria";
-
 
     $scope.getGallery = function () {
         $http.get('http://today.globals.cat/posts/gallery').
@@ -196,8 +243,28 @@ app.controller('TodayCtrl', function ($scope, $ionicModal, $ionicSlideBoxDelegat
                 // or server returns response with an error status.
                 console.log(data);
 
+            }).finally(function () {
+                //alert("test");
+
+                // Stops Pull to refrash scroll
+                $scope.$broadcast('scroll.refreshComplete');
+
             });
     };
+
+    $scope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState, fromParams){
+        if (toState.name == 'tabs.today'){
+            $scope.getGallery();
+        }
+    });
+
+    $scope.init = function () {
+        $scope.getGallery();
+        //$scope.getGallery();
+    };
+
+    $scope.init();
+
 
 
     function getImage() {
@@ -451,36 +518,98 @@ app.controller('ArticleCtrl', function ($scope, $ionicModal, $ionicSlideBoxDeleg
 
  });*/
 
+//factoria que controla la autentificación, devuelve un objeto
+//$cookies para crear cookies
+//$cookieStore para actualizar o eliminar
+//$location para cargar otras rutas
+app.factory("auth", function ($cookies, $cookieStore, $location) {
+    return {
+        login: function (username, password) {
+            //creamos la cookie con el nombre que nos han pasado
+            $cookies.username = username;
+            $cookies.password = password;
+            $cookieStore.put("loged", 'yes');
+            //mandamos a la $cookies.username
+            // console.log($cookies.username);
+            $location.path("/tabs/login");
+        },
+        logout: function () {
+            //al hacer logout eliminamos la cookie con $cookieStore.remove
+            $cookieStore.remove("username");
+            $cookieStore.remove("password");
+            //mandamos al login
+            //console.log($cookies.username);
+            $location.path("/tabs/login");
+        },
+        checkStatus: function () {
+            //creamos un array con las rutas que queremos controlar
+            var rutasPrivadas = ["/login", "/tabs/login", "/login"];
+            console.log($cookies.username);
+            if (this.in_array($location.path(), rutasPrivadas) && typeof($cookies.username) == "undefined") {
+                $location.path("/gallery");
+            }
+            //en el caso de que intente acceder al login y ya haya iniciado sesión lo mandamos a la home
+            if (this.in_array("/login", rutasPrivadas) && typeof($cookies.username) != "undefined") {
+                $location.path("/new-post");
+            }
+        },
+        in_array: function (needle, haystack) {
+            var key = '';
+            for (key in haystack) {
+                if (haystack[key] == needle) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+});
 
-app.controller('LoginCtrl', function ($scope, $ionicModal) {
+app.controller('LoginCtrl', function ($scope, auth, $cookies, $http) {
     $scope.title = "Informació";
 
-
-    $scope.openModal = function () {
-        $scope.modal.show();
-    };
-
-    $scope.closeModal = function () {
-        $scope.modal.hide();
-    };
-    // Cleanup the modal when we're done with it!
-    $scope.$on('$destroy', function () {
-        $scope.modal.remove();
-    });
-    // Execute action on hide modal
-    $scope.$on('modal.hide', function () {
-        // Execute action
-    });
-    // Execute action on remove modal
-    $scope.$on('modal.removed', function () {
-        // Execute action
-    });
-    $scope.$on('modal.shown', function () {
-        console.log('Modal is shown!');
-    });
+    $scope.data = {};
 
 });
 
+app.service('LoginService', function ($q) {
+    return {
+        loginUser: function (name, pw) {
+            var deferred = $q.defer();
+            var promise = deferred.promise;
+
+            if (name == 'user' && pw == 'secret') {
+                deferred.resolve('Benvolgut ' + name + '!');
+
+            } else {
+                deferred.reject('Credencials incorrectes!');
+
+            }
+            promise.success = function (fn) {
+                promise.then(fn);
+                return promise;
+            };
+            promise.error = function (fn) {
+                promise.then(null, fn);
+                return promise;
+            };
+            return promise;
+        }
+    }
+});
+
+app.run(function ($rootScope, auth, $window) {
+    //al cambiar de rutas
+    $rootScope.$on('$routeChangeStart', function () {
+        //llamamos a checkStatus, el cual lo hemos definido en la factoria auth
+        //la cuál hemos inyectado en la acción run de la aplicación
+        auth.checkStatus();
+        $window.location.reload(true);
+
+    });
+
+
+});
 
 app.controller('NewPostCtrl', function ($scope, $state, $http, $ionicActionSheet, Camera, $cordovaFileTransfer, $ionicPopup, $timeout) {
     $scope.title = "Today";

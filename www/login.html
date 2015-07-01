@@ -7,6 +7,43 @@
 
     </ion-nav-buttons>
 
+    <ion-content class="padding" ng-controller="GalleryCtrl">
+
+        <div ng-hide="loged">
+            <img id="logo" src="img/logo.png"/>
+
+            <form name="loginUserForm">
+                <div id="logo" class="list list-inset">
+                    <label class="item item-input">
+                        <input type="text" placeholder="Username" ng-model="username">
+                    </label>
+                    <label class="item item-input">
+                        <input type="password" placeholder="Password" ng-model="password">
+                    </label>
+                </div>
+                <button class="button button-block button-calm" ng-disabled="!loginUserForm.$valid"
+                        ng-click="login(username,password)">Login
+                </button>
+            </form>
+        </div>
+
+
+        <div ng-show="loged==true">
+            <img id="logo" src="img/logo.png"/>
+
+            <div id="logo" class="list list-inset">
+                <p> Benvolgut, t'has loguejat satisfactòriament!</p>
+            </div>
+            <button class="button button-block button-calm" ng-disabled="!loginUserForm.$valid"
+                    ng-click="logout()">Logout
+            </button>
+        </div>
+
+
+    </ion-content>
+</ion-view>
+
+<!--
     <ion-content has-bouncing="true">
 
         <img id="logo" src="img/logo.png" />
@@ -18,4 +55,4 @@
         </div>
 
     </ion-content>
-</ion-view>
+-->
