@@ -16,7 +16,7 @@ app.config(function ($stateProvider, $urlRouterProvider, $ionicConfigProvider, $
     $ionicConfigProvider.tabs.style("standard");
     $ionicConfigProvider.navBar.alignTitle("center");
     $ionicConfigProvider.backButton.text('').icon('ion-chevron-left').previousTitleText(false);
-    $compileProvider.imgSrcSanitizationWhitelist(/^\s*(https?|ftp|mailto|content):/);
+    $compileProvider.imgSrcSanitizationWhitelist(/^\s*(https?|ftp|mailto|content|file|chrome-extensio):/);
     //$compileProvider.imgSrcSanitizationWhitelist(/^\s*(https?|ftp|mailto|file|tel):/);
 
     $urlRouterProvider.otherwise('/tabs/gallery');
@@ -515,7 +515,7 @@ app.controller('NewPostCtrl', function ($scope, $state, $http, $ionicActionSheet
                     Camera.getPicture({
                         correctOrientation: true,
                         quality: 40,
-                        destinationType: navigator.camera.DestinationType.FILE_URI,
+                        destinationType: navigator.camera.DestinationType.NATIVE_URI,
                         encodingType: navigator.camera.EncodingType.JPEG
                     }).then(function (imageData) {
 
