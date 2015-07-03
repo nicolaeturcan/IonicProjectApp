@@ -266,139 +266,10 @@ app.controller('TodayCtrl', function ($scope, $ionicModal, $ionicSlideBoxDelegat
 
     $scope.init();
 
-
-    function getImage() {
-
-        navigator.camera.getPicture(onSuccess, onFail, {
-
-            destinationType: navigator.camera.DestinationType.DATA_URL,
-            encodingType: navigator.camera.EncodingType.JPEG,
-            sourceType: navigator.camera.PictureSourceType.PHOTOLIBRARY
-
-        });
-
-        function onSuccess(imageData) {
-            console.log('OK! ' + imageData);
-            $timeout(function () {
-                $scope.image = imageData;
-                // TODO: CREAR MENSAJE CARGA //
-            }, 1000);
-        }
-
-        function onFail(message) {
-            console.log('Failed because: ' + message);
-        }
-    }
-
-    function getImageCam() {
-
-        navigator.camera.getPicture(onSuccess, onFail, {
-
-            destinationType: navigator.camera.DestinationType.FILE_URI,
-            encodingType: navigator.camera.EncodingType.JPEG,
-            sourceType: navigator.camera.PictureSourceType.CAMERA,
-            correctOrientation: true
-
-        });
-
-        function onSuccess(imageURI) {
-            console.log('OK! ' + imageURI);
-            $timeout(function () {
-                $scope.image = images.image;
-            }, 1000);
-        }
-
-        function onFail(message) {
-            console.log('Failed because: ' + message);
-        }
-    }
-
-    // Insert new image from camera or gallery //
-
-    $scope.openOptions = function () {
-        $ionicActionSheet.show({
-            buttons: [
-                {text: 'Camara'},
-                {text: 'Imagen desde galeria'}
-            ],
-            titleText: 'Nueva fotografia',
-            cancelText: 'Cancelar',
-            cancel: function() {
-                    hideSheet();
-            },
-            buttonClicked: function (index) {
-                if (index === 0) { // Manual Button
-                    console.log('Camara');
-                    getImageCam();
-                }
-                else if (index === 1) {
-                    console.log('Galeria');
-
-                    alert();
-                    //getImage();
-                }
-                return true;
-            }
-        });
-    };
-
-
-    $ionicModal.fromTemplateUrl('gallery-modal.html', {
-        scope: $scope,
-        animation: 'slide-in-up'
-    }).then(function (modal) {
-        $scope.modal = modal;
-    });
-
-    $scope.openModal = function (index) {
-        $ionicSlideBoxDelegate.slide(index);
-        $scope.modal.show();
-    };
-
-    $scope.closeModal = function () {
-        $scope.modal.hide();
-    };
-
-    // Cleanup the modal when we're done with it!
-    $scope.$on('$destroy', function () {
-        $scope.modal.remove();
-    });
-    // Execute action on hide modal
-    $scope.$on('modal.hide', function () {
-        // Execute action
-    });
-    // Execute action on remove modal
-    $scope.$on('modal.removed', function () {
-        // Execute action
-    });
-    $scope.$on('modal.shown', function () {
-        console.log('Modal is shown!');
-    });
-
-    // Call this functions if you need to manually control the slides
-    $scope.next = function () {
-        $ionicSlideBoxDelegate.next();
-    };
-
-    $scope.previous = function () {
-        $ionicSlideBoxDelegate.previous();
-    };
-
-    $scope.goToSlide = function (index) {
-        $scope.modal.show();
-        $ionicSlideBoxDelegate.slide(index);
-    };
-
-    // Called each time the slide changes
-    $scope.slideChanged = function (index) {
-        $scope.slideIndex = index;
-    };
-
 });
 
 app.controller('ArticleCtrl', function ($scope, $ionicModal, $ionicSlideBoxDelegate, $http, $stateParams, $timeout) {
     $scope.title = "Today";
-
 
     getPost();
 
@@ -419,109 +290,37 @@ app.controller('ArticleCtrl', function ($scope, $ionicModal, $ionicSlideBoxDeleg
             });
     }
 
-    function genBrick(i) {
-        var height = 300;
-        var id = ~~(Math.random() * 10000);
-        return {
-            src: 'http://lorempixel.com/g/280/' + height + '/?' + id,
-            index: i
-        };
-    }
-
-    $scope.bricks = [
-        genBrick(0),
-        genBrick(1),
-        genBrick(2)
-
-    ];
-
-    $ionicModal.fromTemplateUrl('gallery-modal.html', {
+    $ionicModal.fromTemplateUrl('modal.html', function(modal) {
+        $scope.gridModal = modal;
+    }, {
         scope: $scope,
         animation: 'slide-in-up'
-    }).then(function (modal) {
-        $scope.modal = modal;
     });
+    // open video modal
+    $scope.openModal = function(selected) {
+        $scope.data.selected = "http://today.globals.cat/uploads/" + selected;
+        console.log( $scope.data.selected);
 
-    $scope.openModal = function (index) {
-        $scope.modal.show();
-        $ionicSlideBoxDelegate.slide(index);
+        $scope.gridModal.show();
     };
-
-    $scope.closeModal = function () {
-        $scope.modal.hide();
+    // close video modal
+    $scope.closeModal = function() {
+        $scope.gridModal.hide();
     };
-
-    // Cleanup the modal when we're done with it!
-    $scope.$on('$destroy', function () {
-        $scope.modal.remove();
+    //Cleanup the video modal when we're done with it!
+    $scope.$on('$destroy', function() {
+        $scope.gridModal.remove();
     });
-    // Execute action on hide modal
-    $scope.$on('modal.hide', function () {
-        // Execute action
-    });
-    // Execute action on remove modal
-    $scope.$on('modal.removed', function () {
-        // Execute action
-    });
-    $scope.$on('modal.shown', function () {
-        console.log('Modal is shown!');
-    });
-
-    // Call this functions if you need to manually control the slides
-    $scope.next = function () {
-        $ionicSlideBoxDelegate.next();
-    };
-
-    $scope.previous = function () {
-        $ionicSlideBoxDelegate.previous();
-    };
-
-    $scope.goToSlide = function (index) {
-        $scope.modal.show();
-        $ionicSlideBoxDelegate.slide(index);
-    };
-
-    // Called each time the slide changes
-    $scope.slideChanged = function (index) {
-        $scope.slideIndex = index;
-    };
-
 });
 
-/*app.controller('ProfileCtrl', function($scope, $ionicModal) {
- $scope.title = "Informació";
-
- $ionicModal.fromTemplateUrl('login.html', {
- scope: $scope,
- animation: 'slide-in-up'
- }).then(function(modal) {
- $scope.modal = modal;
- });
-
- $scope.openModal = function() {
- $scope.modal.show();
- };
-
- $scope.closeModal = function() {
- $scope.modal.hide();
- };
- // Cleanup the modal when we're done with it!
- $scope.$on('$destroy', function() {
- $scope.modal.remove();
- });
- // Execute action on hide modal
- $scope.$on('modal.hide', function() {
- // Execute action
- });
- // Execute action on remove modal
- $scope.$on('modal.removed', function() {
- // Execute action
- });
- $scope.$on('modal.shown', function() {
- console.log('Modal is shown!');
- });
-
- });*/
+app.directive('gridImage', function($img){
+    return function($scope, element, attrs){
+        var url = attrs.gridImage;
+        element.css({
+            'background-image': 'url(' + url + $img + ')'
+        });
+    };
+});
 
 //factoria que controla la autentificación, devuelve un objeto
 //$cookies para crear cookies

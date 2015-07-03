@@ -1,21 +1,21 @@
 
 <ion-view title="{{title}}">
 
-    <ion-content has-bouncing="true" ng-init="getGallery()">
+    <ion-content has-bouncing="true" ng-init="getGallery()" ng-controller="ArticleCtrl">
         <ion-refresher on-refresh="getGallery()"></ion-refresher>
 
         <div class="row" ng-repeat="image in images track by $index" ng-if="$index % 4 === 0">
             <div class="col col-25" ng-if="$index < images.length">
-                <img ng-src="http://today.globals.cat/uploads/{{images[$index]}}" width="100%" />
+                <img ng-src="http://today.globals.cat/uploads/{{images[$index]}}" width="100%" ng-click="openModal(images[$index])"/>
             </div>
             <div class="col col-25" ng-if="$index + 1 < images.length">
-                <img ng-src="http://today.globals.cat/uploads/{{images[$index + 1]}}" width="100%" />
+                <img ng-src="http://today.globals.cat/uploads/{{images[$index + 1]}}" width="100%" ng-click="openModal(images[$index + 1])"/>
             </div>
             <div class="col col-25" ng-if="$index + 2 < images.length">
-                <img ng-src="http://today.globals.cat/uploads/{{images[$index + 2]}}" width="100%" />
+                <img ng-src="http://today.globals.cat/uploads/{{images[$index + 2]}}" width="100%" ng-click="openModal(images[$index + 2])"/>
             </div>
             <div class="col col-25" ng-if="$index + 3 < images.length">
-                <img ng-src="http://today.globals.cat/uploads/{{images[$index + 3]}}" width="100%" />
+                <img ng-src="http://today.globals.cat/uploads/{{images[$index + 3]}}" width="100%" ng-click="openModal(images[$index + 3])"/>
             </div>
         </div>
 

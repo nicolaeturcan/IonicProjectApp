@@ -22,11 +22,25 @@
             </div>
 
             <div class="masonry-article" ng-if="data.img1 || data.img2 || data.img3">
-                    <img class="item-masonry-article" ng-src="http://today.globals.cat/uploads/{{data.img1}}" alt="{{ data.title}} Photo" ng-click="openModal({{ brick.index }})" ng-if="data.img1"/>
-                    <img class="item-masonry-article" ng-src="http://today.globals.cat/uploads/{{data.img2}}" alt="{{ data.title}} Photo" ng-click="openModal({{ brick.index }})" ng-if="data.img2"/>
-                    <img class="item-masonry-article" ng-src="http://today.globals.cat/uploads/{{data.img3}}" alt="{{ data.title}} Photo" ng-click="openModal({{ brick.index }})" ng-if="data.img3"/>
-
+                    <img class="item-masonry-article" ng-src="http://today.globals.cat/uploads/{{data.img1}}" ng-click="openModal(data.img1)" alt="{{ data.title}} Photo" ng-if="data.img1"/>
+                    <img class="item-masonry-article" ng-src="http://today.globals.cat/uploads/{{data.img2}}" ng-click="openModal(data.img2)" alt="{{ data.title}} Photo" ng-if="data.img2"/>
+                    <img class="item-masonry-article" ng-src="http://today.globals.cat/uploads/{{data.img3}}" ng-click="openModal(data.img3)" alt="{{ data.title}} Photo" ng-if="data.img3"/>
             </div>
         </div>
     </ion-content>
+
+    <script id="modal.html" type="text/ng-template">
+        <div class="modal" ng-click="closeModal()">
+            <ion-content>
+
+                <div class="item item-image">
+
+                    <img class = "card-image" ng-src="{{data.selected}}" style="display:block; width:100%; max-width:600px; margin:auto"/>
+
+                </div>
+
+            </ion-content>
+        </div>
+    </script>
+
 </ion-view>
