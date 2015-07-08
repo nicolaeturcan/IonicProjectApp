@@ -13,20 +13,35 @@
         <div class="list card">
 
             <div class="item item-image">
-                <img class="card-image" ng-src="http://today.globals.cat/uploads/{{data.principal}}" alt="{{ data.title}} Photo"/>
+                <img class="card-image" ng-src="http://today.globals.cat/uploads/{{data.principal}}"
+                     alt="{{ data.title}} Photo"/>
             </div>
 
             <div class="item item-text-wrap">
-              <h10 class="modal-h10">{{ data.title }}</h10>
-              <p class="card-text">{{ data.content }}</p>
+                <h10 class="modal-h10">{{ data.title }}</h10>
+                <p class="card-text">{{ data.content }}</p>
             </div>
 
-            <div class="masonry-article" ng-if="data.img1 || data.img2 || data.img3">
-                    <img class="item-masonry-article" ng-src="http://today.globals.cat/uploads/{{data.img1}}" ng-click="openModal(data.img1)" alt="{{ data.title}} Photo" ng-if="data.img1"/>
-                    <img class="item-masonry-article" ng-src="http://today.globals.cat/uploads/{{data.img2}}" ng-click="openModal(data.img2)" alt="{{ data.title}} Photo" ng-if="data.img2"/>
-                    <img class="item-masonry-article" ng-src="http://today.globals.cat/uploads/{{data.img3}}" ng-click="openModal(data.img3)" alt="{{ data.title}} Photo" ng-if="data.img3"/>
+            <div class="masonry-article row" ng-if="data.img1 || data.img2 || data.img3">
+                <div class="col-33">
+                    <img class="item-masonry-article" ng-src="http://recursos.globals.cat/sprites.png" style="background-image:url('http://today.globals.cat/uploads/{{data.img1}}');"
+                         ng-click="openModal(data.img1)" alt="{{ data.title}} Photo" ng-if="data.img1"/>
+
+
+
+                </div>
+                <div class="col-33">
+
+                    <img class="item-masonry-article" ng-src="http://recursos.globals.cat/sprites.png" style="background-image:url('http://today.globals.cat/uploads/{{data.img2}}');"
+                         ng-click="openModal(data.img2)" alt="{{ data.title}} Photo" ng-if="data.img2"/>
+                </div>
+                <div class="col-33">
+
+                    <img class="item-masonry-article" ng-src="http://recursos.globals.cat/sprites.png" style="background-image:url('http://today.globals.cat/uploads/{{data.img3}}');"
+                         ng-click="openModal(data.img3)" alt="{{ data.title}} Photo" ng-if="data.img3"/>
+                    </div>
+                </div>
             </div>
-        </div>
     </ion-content>
 
     <script id="modal.html" type="text/ng-template">
@@ -35,7 +50,8 @@
 
                 <div class="item item-image">
 
-                    <img class = "card-image" ng-src="{{data.selected}}" style="display:block; width:100%; max-width:600px; margin:auto"/>
+                    <img class="card-image" ng-src="{{data.selected}}"
+                         style="display:block; width:100%; max-width:600px; margin:auto"/>
 
                 </div>
 

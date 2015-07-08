@@ -1,7 +1,6 @@
-
 <ion-view title="{{title}}">
 
-    <ion-content has-bouncing="true" ng-init="getGallery()" ng-controller="ArticleCtrl">
+    <ion-content has-bouncing="true" ng-init="getGallery()">
         <ion-refresher on-refresh="getGallery()"></ion-refresher>
 
         <div class="row" ng-repeat="image in images track by $index" ng-if="$index % 4 === 0">
@@ -20,7 +19,70 @@
         </div>
 
     </ion-content>
+    <script id="gallery_modal.html" type="text/ng-template">
+        <div class="modal" ng-click="closeModal()">
+            <ion-content>
+
+                <div class="item item-image">
+
+                    <img class="card-image" ng-src="{{images.gallery_image}}"
+                         style="display:block; width:100%; max-width:600px; margin:auto"/>
+                </div>
+            </ion-content>
+        </div>
+    </script>
 </ion-view>
+
+
+
+<!--
+<ion-view title="{{title}}">
+
+    <ion-content has-bouncing="true" ng-init="getGallery()">
+        <ion-refresher on-refresh="getGallery()"></ion-refresher>
+
+        <div class="row" ng-repeat="image in images track by $index">
+            <div class="col-25" ng-if="$index < images.length">
+                <img ng-src="http://today.globals.cat/uploads/{{image}}" width="100%" ng-click="openModal(image)"/>
+            </div>
+
+        </div>
+    </ion-content>
+
+    <script id="gallery_modal.html" type="text/ng-template">
+        <div class="gallery_modal" ng-click="closeModal()">
+            <ion-content>
+
+                <div class="item item-image">
+
+                    <img class="card-image" ng-src="{{images.gallery_image}}"
+                         style="display:block; width:100%; max-width:600px; margin:auto"/>
+                </div>
+            </ion-content>
+        </div>
+    </script>
+
+</ion-view>-->
+
+
+
+
+
+<!--<ion-view title="{{title}}">
+
+    <ion-content has-bouncing="true" ng-init="getGallery()" ng-controller="ArticleCtrl">
+        <ion-refresher on-refresh="getGallery()"></ion-refresher>
+
+        <div class="row" ng-repeat="image in images track by $index">
+            <div class="col-25">
+                <img ng-if="image" ng-src="http://today.globals.cat/uploads/image" style="background-image:url('http://today.globals.cat/uploads/{{image}}'); background-size:cover; width:50px; float:left; cursor:pointer; height:50px; margin:10px 10px 10px 0; background-repeat:no-repeat; background-position:center; border-radius: 2px 2px 0px 0px;" src="http://recursos.globals.cat/sprites.png"
+                     ng-click="openModal(image)"/>
+            </div>
+        </div>
+
+    </ion-content>
+</ion-view>-->
+
 
 
 

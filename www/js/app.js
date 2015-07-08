@@ -215,7 +215,7 @@ app.controller('GalleryCtrl', function ($scope, $state, $http, $ionicModal, $ion
 
 });
 
-app.controller('TodayCtrl', function ($scope, $ionicModal, $ionicSlideBoxDelegate, $ionicActionSheet, $http, $timeout, Camera) {
+app.controller('TodayCtrl', function ($scope, $ionicModal, $ionicSlideBoxDelegate, $ionicActionSheet, $stateParams, $http, $timeout, Camera) {
     $scope.title = "Galeria";
 
     $scope.getGallery = function () {
@@ -252,6 +252,31 @@ app.controller('TodayCtrl', function ($scope, $ionicModal, $ionicSlideBoxDelegat
 
             });
     };
+
+    $ionicModal.fromTemplateUrl('gallery_modal.html', function(modal) {
+        $scope.gridModal = modal;
+    }, {
+        scope: $scope,
+        animation: 'slide-in-up'
+    });
+
+    // open video modal
+    $scope.openModal = function(gallery_image) {
+        $scope.images.gallery_image = "http://today.globals.cat/uploads/" + gallery_image;
+        console.log($scope.images.gallery_image);
+        console.log(gallery_image);
+
+        $scope.gridModal.show();
+    };
+    // close video modal
+    $scope.closeModal = function() {
+        $scope.gridModal.hide();
+    };
+    //Cleanup the video modal when we're done with it!
+    $scope.$on('$destroy', function() {
+        $scope.gridModal.remove();
+    });
+
 
   /*  $scope.$on('$stateChangeSuccess', function (event, toState, toParams, fromState, fromParams) {
         if (toState.name == 'tabs.today') {

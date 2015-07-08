@@ -18,11 +18,15 @@
 
         <div class="list card" ng-repeat="data in dataGet">
 
-            <ion-item class="list card" item="item"
+            <ion-item class="list card" item="item" style="margin: 0px; padding: 0px;"
                       ng-click="goPost({{ data.id }})">
 
                 <div class="item item-image">
-                    <img class="card-image" src="http://today.globals.cat/uploads/{{data.principal}}" alt="{{ data.title}}">
+                    <img class="main-image" style="background-image:url('http://today.globals.cat/uploads/{{data.principal}}');" src="http://recursos.globals.cat/sprites.png"/>
+
+                    <!--
+                                        <img class="card-image" src="http://today.globals.cat/uploads/{{data.principal}}" alt="{{ data.title}}">
+                    -->
                 </div>
 
                 <div class="item item-text-wrap">
