@@ -12,7 +12,7 @@
 
     </ion-nav-buttons> -->
 
-    <ion-content has-bouncing="true">
+    <ion-content overflow-scroll="true" has-bouncing="true" scroll-event-interval="0" ng-init="updateList()">
 
         <ion-refresher on-refresh="updateList()"></ion-refresher>
 
@@ -22,7 +22,7 @@
                       ng-click="goPost({{ data.id }})">
 
                 <div class="item item-image">
-                    <img class="main-image" style="background-image:url('http://today.globals.cat/uploads/{{data.principal}}');" src="http://recursos.globals.cat/sprites.png"/>
+                    <img class="main-image" style="background-image:url('http://today.globals.cat/uploads/{{data.principal}}');" ng-src="http://recursos.globals.cat/sprites.png"/>
 
                     <!--
                                         <img class="card-image" src="http://today.globals.cat/uploads/{{data.principal}}" alt="{{ data.title}}">

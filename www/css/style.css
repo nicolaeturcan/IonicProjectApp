@@ -4,6 +4,7 @@
 
 .tabs {
     border-top: 0 !important;
+    padding:0px !important;
 }
 
 .tab-item {
@@ -138,7 +139,7 @@ button.header-button:before {
 .card-image {
     position: relative;
     overflow: hidden;
-    height: 200px;
+
 }
 
 .card-image1 {
@@ -359,4 +360,17 @@ div.container4 table {
     -ms-flex-align: center !important;
     align-items: center !important;
 
+}
+.item-icon-left ion-spinner {
+    float: left;
+    margin-left: -3.2em;
+    margin-right: 1em;
+    margin-top: -0.2em;
+}
+
+.spinner svg {
+    width: 28px;
+    height: 28px;
+    stroke: #999;
+    fill: #999;
 }

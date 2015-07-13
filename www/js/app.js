@@ -1,15 +1,5 @@
-var app = angular.module('navApp', ['ionic', 'swipe', 'wu.masonry', 'ab-base64', 'base64', 'ui.router', 'ngCordova', 'ngCordova.plugins.fileTransfer', 'ngRoute', 'ngCookies'])
+var app = angular.module('navApp', ['ionic', 'ui.router', 'ngCordova', 'ngCordova.plugins.fileTransfer', 'ngRoute', 'ngCookies']);
 
-/*app.run(function($cordovaStatusbar) {
-
- // Change Statusbar color //
- $cordovaStatusbar.overlaysWebView(true);
-
- $cordovaStatusbar.styleHex('#b73e2a');
-
- })*/
-//var loguejat;
-// RUTAS
 app.config(function ($stateProvider, $urlRouterProvider, $ionicConfigProvider, $compileProvider) {
 
     $ionicConfigProvider.tabs.position('bottom');
@@ -139,7 +129,7 @@ app.controller('GalleryCtrl', function ($scope, $state, $http, $ionicModal, $ion
 
     $scope.updateList = function () {
         $http.get('http://today.globals.cat/posts').
-            success(function (data, status, headers, config) {
+            success(function (data) {
                 // this callback will be called asynchronously
                 // when the response is available
 
@@ -179,14 +169,13 @@ app.controller('GalleryCtrl', function ($scope, $state, $http, $ionicModal, $ion
                 //data: post_data,
                 headers: {'Content-Type': 'application/x-www-form-urlencoded'}
             }).
-                success(function (data, status, headers, config) {
+                success(function (data, status) {
                     $rootScope.loged = true;
-
 
                     console.log($scope.loged);
                     console.log("Post status: ", status);
                 }).
-                error(function (data, status, headers, config) {
+                error(function (data, status) {
                     console.log("Error!");
                     console.log(status, data);
                 });
@@ -199,39 +188,44 @@ app.controller('GalleryCtrl', function ($scope, $state, $http, $ionicModal, $ion
 
     };
 
-    $scope.init = function () {
+/*    $scope.init = function () {
         $scope.updateList();
-        //$scope.getGallery();
-    };
+    };*/
 
     // Actualitza l'estat de la vista cada vegada que s'accedeix a ella.
-/*    $scope.$on('$stateChangeSuccess', function (event, toState, toParams, fromState, fromParams) {
-        if (toState.name == 'tabs.gallery') {
-            $scope.updateList();
-        }
-    });*/
+    /*    $scope.$on('$stateChangeSuccess', function (event, toState, toParams, fromState, fromParams) {
+     if (toState.name == 'tabs.gallery') {
+     $scope.updateList();
+     }
+     });*/
 
-    $scope.init();
+    //$scope.init();
 
 });
 
-app.controller('TodayCtrl', function ($scope, $ionicModal, $ionicSlideBoxDelegate, $ionicActionSheet, $stateParams, $http, $timeout, Camera) {
+app.controller('TodayCtrl', function ($scope, $ionicModal, $ionicActionSheet, $stateParams, $http, $ionicLoading) {
     $scope.title = "Galeria";
 
     $scope.getGallery = function () {
+        $ionicLoading.show({
+            noBackdrop: true,
+            template: '<p class="item-icon-left">Loading stuff...<ion-spinner icon="lines"/></p>',
+
+        });
         $http.get('http://today.globals.cat/posts/gallery').
-            success(function (data, status, headers, config) {
+            success(function (data) {
                 $scope.images = [];
-                i2 = 0;
+                var i2 = 0;
 
                 //$scope.data_gallery = data;
-                for (i = 0; i < data.length; i++) {
-                    for (key in data[i]) {
+                for (var i = 0; i < data.length; i++) {
+                    for (var key in data[i]) {
                         if (data[i].hasOwnProperty(key)) {
                             //console.log(data[i][key]);
                             if (data[i][key]) {
-                                $scope.images[i2++] = data[i][key];
+                                $scope.images[i2++] = "http://today.globals.cat/uploads/" + data[i][key];
                                 console.log(data[i][key]);
+                                $ionicLoading.hide();
                             }
                         }
                     }
@@ -239,7 +233,8 @@ app.controller('TodayCtrl', function ($scope, $ionicModal, $ionicSlideBoxDelegat
                 }
                 //console.log($scope.images);
 
-            }).error(function (data, status, headers, config) {
+
+            }).error(function (data) {
                 // called asynchronously if an error occurs
                 // or server returns response with an error status.
                 console.log(data);
@@ -253,7 +248,16 @@ app.controller('TodayCtrl', function ($scope, $ionicModal, $ionicSlideBoxDelegat
             });
     };
 
-    $ionicModal.fromTemplateUrl('gallery_modal.html', function(modal) {
+/*
+    $scope.init = function () {
+        $scope.getGallery();
+        //$scope.getGallery();
+    };
+
+    $scope.init();
+*/
+
+    $ionicModal.fromTemplateUrl('gallery_modal.html', function (modal) {
         $scope.gridModal = modal;
     }, {
         scope: $scope,
@@ -261,53 +265,38 @@ app.controller('TodayCtrl', function ($scope, $ionicModal, $ionicSlideBoxDelegat
     });
 
     // open video modal
-    $scope.openModal = function(gallery_image) {
-        $scope.images.gallery_image = "http://today.globals.cat/uploads/" + gallery_image;
+    $scope.openModal = function (gallery_image) {
+        $scope.images.gallery_image = gallery_image;
         console.log($scope.images.gallery_image);
         console.log(gallery_image);
 
         $scope.gridModal.show();
     };
     // close video modal
-    $scope.closeModal = function() {
+    $scope.closeModal = function () {
         $scope.gridModal.hide();
     };
     //Cleanup the video modal when we're done with it!
-    $scope.$on('$destroy', function() {
+    $scope.$on('$destroy', function () {
         $scope.gridModal.remove();
     });
-
-
-  /*  $scope.$on('$stateChangeSuccess', function (event, toState, toParams, fromState, fromParams) {
-        if (toState.name == 'tabs.today') {
-            $scope.getGallery();
-        }
-    });*/
-
-    $scope.init = function () {
-        $scope.getGallery();
-        //$scope.getGallery();
-    };
-
-    $scope.init();
-
 });
 
-app.controller('ArticleCtrl', function ($scope, $ionicModal, $ionicSlideBoxDelegate, $http, $stateParams, $timeout) {
+app.controller('ArticleCtrl', function ($scope, $ionicModal, $http, $stateParams) {
     $scope.title = "Today";
 
     getPost();
 
     function getPost() {
         $http.get('http://today.globals.cat/posts/' + $stateParams.id).
-            success(function (data, status, headers, config) {
+            success(function (data) {
                 // this callback will be called asynchronously
                 // when the response is available
                 $scope.data = data;
                 console.log(angular.toJson(data));
                 console.log(data.title);
                 console.log(data.content);
-            }).error(function (data, status, headers, config) {
+            }).error(function (data) {
                 // called asynchronously if an error occurs
                 // or server returns response with an error status.
                 console.log(data);
@@ -315,36 +304,40 @@ app.controller('ArticleCtrl', function ($scope, $ionicModal, $ionicSlideBoxDeleg
             });
     }
 
-    $ionicModal.fromTemplateUrl('modal.html', function(modal) {
+    $ionicModal.fromTemplateUrl('modal.html', function (modal) {
         $scope.gridModal = modal;
     }, {
         scope: $scope,
         animation: 'slide-in-up'
     });
     // open video modal
-    $scope.openModal = function(selected) {
+    $scope.openModal = function (selected) {
         $scope.data.selected = "http://today.globals.cat/uploads/" + selected;
-        console.log( $scope.data.selected);
+        console.log($scope.data.selected);
 
         $scope.gridModal.show();
     };
     // close video modal
-    $scope.closeModal = function() {
+    $scope.closeModal = function () {
         $scope.gridModal.hide();
     };
     //Cleanup the video modal when we're done with it!
-    $scope.$on('$destroy', function() {
+    $scope.$on('$destroy', function () {
         $scope.gridModal.remove();
     });
 });
 
-app.directive('gridImage', function($img){
-    return function($scope, element, attrs){
+/*app.directive('gridImage', function ($img) {
+    return function ($scope, element, attrs) {
         var url = attrs.gridImage;
         element.css({
             'background-image': 'url(' + url + $img + ')'
         });
     };
+});*/
+
+app.factory('myCache', function($cacheFactory) {
+    return $cacheFactory('myData');
 });
 
 //factoria que controla la autentificación, devuelve un objeto
@@ -383,7 +376,7 @@ app.factory("auth", function ($cookies, $cookieStore, $location) {
             }
         },
         in_array: function (needle, haystack) {
-            var key = '';
+            var key;
             for (key in haystack) {
                 if (haystack[key] == needle) {
                     return true;
@@ -394,7 +387,7 @@ app.factory("auth", function ($cookies, $cookieStore, $location) {
     }
 });
 
-app.controller('LoginCtrl', function ($scope, auth, $cookies, $http) {
+app.controller('LoginCtrl', function ($scope) {
     $scope.title = "Informació";
 
     $scope.data = {};
@@ -440,7 +433,7 @@ app.run(function ($rootScope, auth, $window) {
 
 });
 
-app.controller('NewPostCtrl', function ($scope, $state, $http, $ionicActionSheet, Camera, $cordovaFileTransfer, $ionicPopup, $timeout) {
+app.controller('NewPostCtrl', function ($scope, $state, $http, $ionicActionSheet, Camera, $cordovaFileTransfer, $ionicPopup) {
     $scope.title = "Today";
 
     $scope.newPost = function () {
@@ -448,7 +441,7 @@ app.controller('NewPostCtrl', function ($scope, $state, $http, $ionicActionSheet
         // Create new id
 
         $http.post('http://today.globals.cat/posts/create').
-            success(function (data, status, headers, config) {
+            success(function (data) {
                 // this callback will be called asynchronously
                 // when the response is available
 
@@ -480,7 +473,7 @@ app.controller('NewPostCtrl', function ($scope, $state, $http, $ionicActionSheet
                 console.log(post_data);
 
                 $http.post(url, post_data).
-                    success(function (data, status, headers, config) {
+                    success(function (data, status) {
                         console.log("DONE!");
                         console.log(data);
                         console.log(status);
@@ -506,7 +499,7 @@ app.controller('NewPostCtrl', function ($scope, $state, $http, $ionicActionSheet
 
 
                     }).
-                    error(function (data, status, headers, config) {
+                    error(function (data, status) {
                         console.log("BADD!");
                         console.log(data);
                         console.log(status);
@@ -514,7 +507,7 @@ app.controller('NewPostCtrl', function ($scope, $state, $http, $ionicActionSheet
                         // or server returns response with an error status.
                     });
 
-            }).error(function (data, status, headers, config) {
+            }).error(function (data) {
                 // called asynchronously if an error occurs
                 // or server returns response with an error status.
                 console.log(data);
@@ -531,7 +524,7 @@ app.controller('NewPostCtrl', function ($scope, $state, $http, $ionicActionSheet
                 {text: '<i class="icon ion-images"></i> Galeria'}
             ],
             cancelText: 'Cancelar',
-            cancel: function() {
+            cancel: function () {
                 console.log('CANCELLED');
             },
             buttonClicked: function (index) {
@@ -621,55 +614,55 @@ app.controller('NewPostCtrl', function ($scope, $state, $http, $ionicActionSheet
                         console.log("before replace", imageData);
 
 
-                        if (imageData.substring(0,21)=="content://com.android") {
-                            photo_split = imageData.split("%3A");
-                            filename= photo_split[1] + ".jpg";
-                        }else{
+                        if (imageData.substring(0, 21) == "content://com.android") {
+                            var photo_split = imageData.split("%3A");
+                            filename = photo_split[1] + ".jpg";
+                        } else {
                             var filename = imageData.replace(/^.*[\\\/]/, '');
                         }
 
 
                         console.log("after replace", filename);
 
-                            upload();
+                        upload();
 
-                            function upload() {
+                        function upload() {
 
-                                var options = {
-                                    fileKey: $img,
-                                    fileName: imageData.substr(imageData.lastIndexOf('/'))
-                                };
+                            var options = {
+                                fileKey: $img,
+                                fileName: imageData.substr(imageData.lastIndexOf('/'))
+                            };
 
-                                $cordovaFileTransfer.upload("http://today.globals.cat/posts/" + $scope.postId + "/" + filename + "/upload", imageData, options).then(function (result) {
-                                    console.log("SUCCESS: " + JSON.stringify(result.response));
-                                }, function (err) {
-                                    console.log("ERROR: " + JSON.stringify(err));
-                                }, function (progress) {
-                                    console.log("EN PROCESO!");
-                                });
-                            }
+                            $cordovaFileTransfer.upload("http://today.globals.cat/posts/" + $scope.postId + "/" + filename + "/upload", imageData, options).then(function (result) {
+                                console.log("SUCCESS: " + JSON.stringify(result.response));
+                            }, function (err) {
+                                console.log("ERROR: " + JSON.stringify(err));
+                            }, function (progress) {
+                                console.log("EN PROCESO!");
+                            });
+                        }
 
-                            if ($img === 'principal') {
-                                $scope.imagePrinc = imageData;
-                                $scope.nameOfPrincipal = filename;
+                        if ($img === 'principal') {
+                            $scope.imagePrinc = imageData;
+                            $scope.nameOfPrincipal = filename;
 
-                            } else if ($img === 'img1') {
-                                $scope.image1 = imageData;
-                                $scope.nameOfImage1 = filename;
+                        } else if ($img === 'img1') {
+                            $scope.image1 = imageData;
+                            $scope.nameOfImage1 = filename;
 
-                            } else if ($img === 'img2') {
-                                $scope.image2 = imageData;
-                                $scope.nameOfImage2 = filename;
+                        } else if ($img === 'img2') {
+                            $scope.image2 = imageData;
+                            $scope.nameOfImage2 = filename;
 
-                            } else if ($img === 'img3') {
-                                $scope.image3 = imageData;
-                                $scope.nameOfImage3 = filename;
+                        } else if ($img === 'img3') {
+                            $scope.image3 = imageData;
+                            $scope.nameOfImage3 = filename;
 
-                            }
+                        }
 
-                        }, function (err) {
-                            console.err(err);
-                        })
+                    }, function (err) {
+                        console.err(err);
+                    })
                 }
             }
         });
